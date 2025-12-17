@@ -27,49 +27,78 @@ def generate_brief(company_name: str, website_content: str, news_results: list, 
     else:
         news_text = "No recent news found."
 
-    scraped_status = "Yes" if len(website_content) > 100 and "unavailable" not in website_content else "No"
+    # Determine status for header
+    scraped_bool = len(website_content) > 100 and "unavailable" not in website_content
+    scraped_status_str = "Yes" if scraped_bool else "No (Restricted)"
+    
+    # Construct the data source line exactly as requested
+    header_line = f"📊 Research Sources: DuckDuckGo + Google News | Website: {scraped_status_str} | Articles Analyzed: {article_count}"
+    
+    # Handle empty value proposition fallback for the prompt
+    val_prop_context = value_proposition if value_proposition and value_proposition.strip() else "Premium B2B Services"
 
     prompt = f"""
-    You are a B2B Strategy Expert. Your goal is to write a "Strategic Account Brief" for a sales rep who is about to meet with executives from {company_name}.
-    
-    Here is the Company's Website Content (truncated):
+    You are a B2B Strategy Expert creating a Strategic Account Brief for a sales professional.
+
+    COMPANY: {company_name}
+
+    WEBSITE CONTENT (truncated):
     {website_content[:15000]}
-    
-    Here is Recent News (Last 6 Months):
+
+    RECENT NEWS (Last 6 Months):
     {news_text}
 
-    Here is the User's Value Proposition / Product Focus:
-    "{value_proposition}"
-    
-    Please generate a structured Markdown Brief. 
-    
-    CRITICAL INSTRUCTIONS:
-    1. List ALL news items found. If zero news, state: 'No news found across targeted search queries.'
-    2. LANGUAGE PERSPECTIVE: When referencing the user's solution, ALWAYS use 'Your' (e.g., 'Your cybersecurity solutions...'). NEVER use 'Our'. You are writing FOR the user, not AS the user. Keep tone professional and geographically neutral.
-    3. DATE FORMATTING: In 'Recent Developments', always start with "[Month Year]:" if date is available, or "Recent:" if not. Extract dates from news snippets where possible.
+    USER'S SOLUTION:
+    "{val_prop_context}"
 
-    Start the brief with exactly this Header Section:
-    ## Research Data Sources: DuckDuckGo + Google News
-    * Scraped Website: {scraped_status}
-    * Total Articles Analyzed: {article_count}
-    
-    Then continue with the standard sections:
-    
+    Generate a brief following this EXACT structure:
+
+    At the very top, include this metadata line in plain text:
+    📊 Research Sources: DuckDuckGo + Google News | Website: [Yes/No] | Articles Analyzed: {len(news_results)}
+
     # Strategic Account Brief: {company_name}
-    
+
     ## 1. Company Profile
-    *High-level overview of what they do, their primary industry, and key offerings.*
-    
+    Provide a concise 2-3 sentence overview of what the company does, their primary industry, and key offerings based on the website content provided.
+
     ## 2. Recent Developments
-    *Summarize the key recent news events and what they mean for the company's direction. Use the date format "[Month Year]: [Development]".*
-    
+    List recent news with specific dates in [Month Year] format. Each item should be a bullet point starting with the date in square brackets, followed by the development. If no news found, state: "No recent news articles were found in our search."
+
     ## 3. Buying Signals & Strategic Shifts
-    *Identify specific initiatives, expansions, or challenges that might indicate a need for B2B solutions.*
-    
+    Identify 3-5 specific indicators from the news and company info that suggest they might need B2B solutions. Focus on: expansion, technology changes, regulatory challenges, growth signals, operational efficiency drives. Write as a cohesive paragraph, NOT bullet points.
+
     ## 4. Strategic Messaging Hooks
-    *Using the user's 'Value Proposition', generate 3 specific conversation starters connecting the company's news/challenges to 'Your' solution. Explain relevance.*
+
+    CRITICAL FORMAT - You MUST follow this structure EXACTLY for each hook:
+
+    1. [Hook Title]: "[Quoted messaging text the user can use verbatim with this prospect]"
     
-    Format the output as clean Markdown.
+    Relevance: [2-3 sentences explaining why this hook is specifically relevant to this company's situation based on the news/context you found]
+
+    2. [Hook Title]: "[Quoted messaging text]"
+    
+    Relevance: [Explanation tied to specific company context]
+
+    3. [Hook Title]: "[Quoted messaging text]"
+    
+    Relevance: [Explanation tied to specific company context]
+
+    EXAMPLE of correct format:
+
+    1. Securing Digital Currency Infrastructure: "With your recent expansion into digital currency scanning technologies, how do you ensure these systems remain protected from ransomware and breaches with managed threat detection solutions?"
+    
+    Relevance: The company's involvement in digital currency technologies creates new attack surfaces that require specialized cybersecurity monitoring and response capabilities.
+
+    CRITICAL FORMATTING RULES:
+    - Do NOT use markdown code blocks (```) anywhere in your output
+    - Use ## for main section headings only  
+    - Do NOT use bold (**) within paragraph text except for emphasis in hook titles
+    - Keep all currency and number formatting as plain text
+    - Each messaging hook MUST include both the quoted text AND the Relevance explanation
+    - Relevance explanations must reference specific details from the company's news or situation
+    - Never start a sentence with "Your" - use second person naturally within sentences only
+
+    Output in clean, professional Markdown. Be specific and actionable throughout.
     """
 
     try:
@@ -79,8 +108,18 @@ def generate_brief(company_name: str, website_content: str, news_results: list, 
                 {"role": "system", "content": "You are a helpful and insightful B2B strategic assistant."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.7
+            temperature=0.3
         )
-        return response.choices[0].message.content
+        content = response.choices[0].message.content
+        
+        # Strip potential markdown code block wrapping
+        if content.startswith("```markdown"):
+            content = content.replace("```markdown", "").replace("```", "")
+        elif content.startswith("```"):
+             content = content.replace("```", "")
+             
+        # Content now includes the header as per the new prompt instructions
+        return content
+
     except Exception as e:
         return f"Error generating brief: {str(e)}"
