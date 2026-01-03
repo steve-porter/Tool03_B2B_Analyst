@@ -5,3 +5,4 @@ duckduckgo-search
 openai
 fake_useragent
 python-dotenv
+PyPDF2
