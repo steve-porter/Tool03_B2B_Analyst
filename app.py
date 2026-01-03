@@ -165,7 +165,7 @@ with st.sidebar:
     
     mode_options = [
         "🎯 Sales & Marketing Outreach", 
-        "🎓 Career Strategy & Interview Prep"
+        "🎓 Job Interview Prep"
     ]
     
     # Initialize session state
@@ -194,16 +194,36 @@ with col_content:
     # Mobile mode selector (visible only on mobile)
     st.markdown("""
         <style>
+        /* Hide mobile selector on desktop */
         @media (min-width: 769px) {
-            div[data-testid="stSelectbox"]:has(label:contains("Mode")) {
+            div[data-testid="stSelectbox"]:has(label:contains("Platform Mode")) {
                 display: none !important;
+            }
+        }
+        /* Enhanced visibility for mobile selector */
+        @media (max-width: 768px) {
+            /* Style the selectbox container */
+            div[data-testid="stSelectbox"] select {
+                background-color: #252538 !important;
+                border: 2px solid #6366F1 !important;
+                color: #FFFFFF !important;
+                font-size: 1rem !important;
+                padding: 0.75rem !important;
+                border-radius: 10px !important;
+            }
+            /* Label styling */
+            div[data-testid="stSelectbox"] label {
+                color: #E5E7EB !important;
+                font-weight: 600 !important;
+                font-size: 0.95rem !important;
+                margin-bottom: 0.5rem !important;
             }
         }
         </style>
     """, unsafe_allow_html=True)
     
     mobile_mode = st.selectbox(
-        "Mode",
+        "Platform Mode",
         mode_options,
         index=0 if st.session_state.analysis_mode == "Sales Outreach" else 1,
         key="mobile_mode"
