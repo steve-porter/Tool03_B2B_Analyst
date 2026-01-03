@@ -168,16 +168,21 @@ with st.sidebar:
         "🎓 Career Strategy & Interview Prep"
     ]
     
+    # Initialize session state
+    if 'analysis_mode' not in st.session_state:
+        st.session_state.analysis_mode = "Sales Outreach"
+    
     selected_mode_text = st.radio(
         "Select Analysis Mode",
         mode_options,
-        index=0,
+        index=0 if st.session_state.analysis_mode == "Sales Outreach" else 1,
         label_visibility="collapsed",
-        help="Sales: Strategic account briefs with buying signals and messaging hooks.\nCareers: CV-to-company alignment with strategic interview questions."
+        help="Sales: Strategic account briefs with buying signals and messaging hooks.\nCareers: CV-to-company alignment with strategic interview questions.",
+        key="sidebar_mode"
     )
     
-    # Extract mode for logic
-    analysis_mode = "Sales Outreach" if "Sales" in selected_mode_text else "Interview Prep"
+    # Update session state
+    st.session_state.analysis_mode = "Sales Outreach" if "Sales" in selected_mode_text else "Interview Prep"
 
     st.markdown("---")
     st.caption("v2.2 Intelligence Platform")
@@ -186,9 +191,28 @@ with st.sidebar:
 col_spacer, col_content = st.columns([1, 10])
 
 with col_content:
+    # Mobile mode selector (visible only on mobile)
+    st.markdown("""
+        <style>
+        @media (min-width: 769px) {
+            div[data-testid="stSelectbox"]:has(label:contains("Mode")) {
+                display: none !important;
+            }
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    mobile_mode = st.selectbox(
+        "Mode",
+        mode_options,
+        index=0 if st.session_state.analysis_mode == "Sales Outreach" else 1,
+        key="mobile_mode"
+    )
+    st.session_state.analysis_mode = "Sales Outreach" if "Sales" in mobile_mode else "Interview Prep"
+    
     st.markdown('<h1 class="main-header">Company Intelligence Platform</h1>', unsafe_allow_html=True)
     
-    badge_text = "Strategic Account Briefs" if analysis_mode == "Sales Outreach" else "Career Strategy Advisor"
+    badge_text = "Strategic Account Briefs" if st.session_state.analysis_mode == "Sales Outreach" else "Career Strategy Advisor"
     st.markdown(f'<div class="mode-badge">{badge_text}</div>', unsafe_allow_html=True)
 
     # Input Section
@@ -200,7 +224,7 @@ with col_content:
     cv_text = None
     value_proposition = None
 
-    if analysis_mode == "Sales Outreach":
+    if st.session_state.analysis_mode == "Sales Outreach":
         st.markdown("### 2. My Solution")
         value_proposition = st.text_area(
             "Value Proposition / Product Focus", 
@@ -231,12 +255,12 @@ with col_content:
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Action Button
-    btn_label = "Generate Strategic Brief" if analysis_mode == "Sales Outreach" else "Generate Interview Strategy"
+    btn_label = "Generate Strategic Brief" if st.session_state.analysis_mode == "Sales Outreach" else "Generate Interview Strategy"
     
     if st.button(btn_label, use_container_width=True):
         if not url:
             st.warning("Please enter a company URL.")
-        elif analysis_mode == "Interview Prep" and not jd_content:
+        elif st.session_state.analysis_mode == "Interview Prep" and not jd_content:
             st.warning("Please provide a Job Description.")
         elif not os.getenv("OPENAI_API_KEY"):
              st.error("API Key missing.")
@@ -244,7 +268,7 @@ with col_content:
             try:
                 company_name = extract_company_name(url) or "Target Company"
                 
-                with st.status(f"🛠️ Building {analysis_mode} Report...") as status:
+                with st.status(f"🛠️ Building {st.session_state.analysis_mode} Report...") as status:
                     st.write("Scraping website...")
                     website_content = scrape_website(url) or "Website content unavailable."
                     
@@ -256,7 +280,7 @@ with col_content:
                         company_name=company_name,
                         website_content=website_content,
                         news_results=news_results,
-                        mode=analysis_mode,
+                        mode=st.session_state.analysis_mode,
                         value_proposition=value_proposition,
                         job_description=jd_content,
                         cv_text=cv_text
