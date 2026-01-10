@@ -29,53 +29,102 @@ st.markdown("""
     }
     
     .stApp {
-        background-color: #0F0F17;
+        background-color: #1C1C2B;
     }
 
-    /* Sidebar Styling */
-    [data-testid="stSidebar"] {
-        background-color: #161625 !important;
-        border-right: 1px solid #252538;
-    }
+    /* ===== INLINE MODE TOGGLE (SEGMENTED CONTROL) ===== */
     
-    /* Style radio buttons as clickable tiles */
-    div.row-widget.stRadio > div {
+    /* Container */
+    div[data-testid="stRadio"][data-baseweb="radio"] {
         background-color: transparent !important;
-        gap: 12px;
     }
-    
-    div.row-widget.stRadio div[role="radiogroup"] > label {
-        background-color: #252538 !important;
-        border: 2px solid #374151 !important;
-        padding: 20px !important;
-        border-radius: 12px !important;
-        margin-bottom: 12px !important;
-        display: block !important;
+
+    /* Radio group - horizontal card-style layout */
+    div[data-testid="stRadio"] > div[role="radiogroup"] {
+        flex-direction: row !important;
+        gap: 16px !important;  /* Space between cards */
+        justify-content: center !important;
+        background-color: transparent !important;  /* Remove container background */
+        border-radius: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+    }
+
+    /* Individual radio labels - bordered card style */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+        flex: 1 !important;
+        min-height: 5rem !important;
+        max-width: 280px !important;
+        padding: 1rem 1.5rem !important;
+        
+        /* Always show border for definition */
+        border: 1.5px solid #2F3045 !important;
+        background-color: #232335 !important;
+        
+        border-radius: 18px !important;
         cursor: pointer !important;
         transition: all 0.3s ease !important;
-        width: 100% !important;
-    }
-    
-    div.row-widget.stRadio div[role="radiogroup"] > label:hover {
-        border-color: #6366F1 !important;
-        background-color: #2A2A40 !important;
-        transform: translateY(-2px);
-    }
-    
-    div.row-widget.stRadio div[role="radiogroup"] > label:has(input:checked) {
-        border-color: #6366F1 !important;
-        background-color: #1E1E3F !important;
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.3) !important;
+        margin: 0 !important;
+        
+        /* Center text */
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        
+        color: #C7C9D3 !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
+        line-height: 1.4 !important;
     }
 
-    div.row-widget.stRadio div[role="radiogroup"] label span[data-testid="stWidgetLabel"] {
+    /* Hover state - preview selection with cyan border */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
+        border-color: #22D3EE !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* Selected state - cyan border + glow, SAME background */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
+        /* KEY: Keep same background as unselected for balance */
+        background-color: #232335 !important;
+        
+        /* Differentiate with border + glow */
+        border: 2px solid #22D3EE !important;
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.3) !important;
+        
+        /* Brighter text for selected state */
         color: #FFFFFF !important;
         font-weight: 600 !important;
-        font-size: 1rem !important;
+        
+        transform: none !important;
     }
-    
-    div.row-widget.stRadio input {
-        display: none;
+
+    /* Force white text on selected state - override Streamlit */
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) *,
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) span,
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) p,
+    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) div {
+        color: #FFFFFF !important;
+        font-weight: 600 !important;
+    }
+
+    /* Hide radio circles completely */
+    div[data-testid="stRadio"] input[type="radio"] {
+        display: none !important;
+    }
+
+    /* Mobile: stack vertically */
+    @media (max-width: 768px) {
+        div[data-testid="stRadio"] > div[role="radiogroup"] {
+            flex-direction: column !important;
+        }
+        
+        div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+            max-width: 100% !important;
+            min-height: 4rem !important;
+        }
     }
 
     /* Text Contrast */
@@ -94,31 +143,19 @@ st.markdown("""
         margin-bottom: 0.5rem !important;
     }
 
-    .mode-badge {
-        display: inline-block;
-        padding: 0.35rem 0.85rem;
-        background-color: rgba(99, 102, 241, 0.15);
-        color: #818CF8;
-        border: 1px solid rgba(129, 140, 248, 0.4);
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-bottom: 2rem;
-    }
+
 
     /* Input Fields */
     .stTextInput input, .stTextArea textarea {
-        background-color: #161625 !important; 
+        background-color: #232335 !important; 
         color: #FFFFFF !important;
-        border: 1px solid #374151 !important;
-        border-radius: 10px !important;
+        border: 1px solid #2F3045 !important;
+        border-radius: 18px !important;
     }
     
     .stTextInput input:focus, .stTextArea textarea:focus {
-        border-color: #6366F1 !important;
-        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+        border-color: #22D3EE !important;
+        box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2) !important;
     }
     
     ::placeholder {
@@ -126,28 +163,37 @@ st.markdown("""
         opacity: 1 !important;
     }
 
-    /* Blue Gradient Button */
+    /* Primary CTA Button */
     .stButton button {
-        background: linear-gradient(135deg, #6366F1 0%, #4F46E5 100%) !important;
-        color: white !important;
-        border-radius: 10px !important;
+        background: #22D3EE !important;
+        color: #1C1C2B !important;
+        border-radius: 18px !important;
         padding: 0.75rem 2rem !important;
         font-weight: 600 !important;
         border: none !important;
         transition: all 0.3s ease !important;
     }
     
+    /* Force dark text on button - override Streamlit */
+    .stButton button *,
+    .stButton button p,
+    .stButton button span,
+    .stButton button div {
+        color: #1C1C2B !important;
+    }
+    
     .stButton button:hover {
+        background: #06B6D4 !important;
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(99, 102, 241, 0.5) !important;
+        box-shadow: 0 8px 25px rgba(34, 211, 238, 0.5) !important;
     }
 
     /* Brief Container */
     .brief-container {
-        background-color: #161625;
+        background-color: #232335;
         padding: 2.5rem;
-        border-radius: 16px;
-        border: 1px solid #2D2D3F;
+        border-radius: 18px;
+        border: 1px solid #2F3045;
         margin-top: 2rem;
         color: #E5E7EB;
     }
@@ -158,46 +204,43 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# Sidebar
-with st.sidebar:
-    st.markdown("### Platform Mode")
-    st.markdown('<p style="color: #9CA3AF; font-size: 0.9rem; margin-bottom: 1.5rem;">Choose your intelligence focus:</p>', unsafe_allow_html=True)
-    
-    mode_options = [
-        "🎯 Sales & Marketing Outreach", 
-        "🎓 Job Interview Prep"
-    ]
-    
-    # Initialize session state
-    if 'analysis_mode' not in st.session_state:
-        st.session_state.analysis_mode = "Sales Outreach"
-    
-    selected_mode_text = st.radio(
-        "Select Analysis Mode",
-        mode_options,
-        index=0 if st.session_state.analysis_mode == "Sales Outreach" else 1,
-        label_visibility="collapsed",
-        help="Sales: Strategic account briefs with buying signals and messaging hooks.\nCareers: CV-to-company alignment with strategic interview questions.",
-        key="sidebar_mode"
-    )
-    
-    # Update session state
-    st.session_state.analysis_mode = "Sales Outreach" if "Sales" in selected_mode_text else "Interview Prep"
 
-    st.markdown("---")
-    st.caption("v2.2 Intelligence Platform")
 
 # Main Content
 col_spacer, col_content = st.columns([1, 10])
 
 with col_content:
-    # Note: Mobile mode selector removed - sidebar handles all mode switching
-    # The sidebar is accessible on mobile via Streamlit's hamburger menu
-    
     st.markdown('<h1 class="main-header">Company Intelligence Platform</h1>', unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     
-    badge_text = "Strategic Account Briefs" if st.session_state.analysis_mode == "Sales Outreach" else "Career Strategy Advisor"
-    st.markdown(f'<div class="mode-badge">{badge_text}</div>', unsafe_allow_html=True)
+    # Initialize session state for mode
+    if 'analysis_mode' not in st.session_state:
+        st.session_state.analysis_mode = "Target Account Research"
+    
+    # Mode selector - centered, prominent
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown(
+            '<p style="text-align: center; color: #C7C9D3; font-size: 0.9rem; '
+            'margin-bottom: 0.75rem; font-weight: 500;">Select your intelligence focus:</p>',
+            unsafe_allow_html=True
+        )
+        
+        mode_choice = st.radio(
+            "Mode",
+            options=["Target Account Research", "Job Interview Prep"],
+            horizontal=True,
+            label_visibility="collapsed",
+            index=0 if st.session_state.analysis_mode == "Target Account Research" else 1,
+            key="mode_selector"
+        )
+        
+        # Update session state and rerun if changed
+        if mode_choice != st.session_state.analysis_mode:
+            st.session_state.analysis_mode = mode_choice
+            st.rerun()
+    
+    st.markdown("<br>", unsafe_allow_html=True)
 
     # Input Section
     st.markdown("### 1. Target Company")
@@ -208,7 +251,7 @@ with col_content:
     cv_text = None
     value_proposition = None
 
-    if st.session_state.analysis_mode == "Sales Outreach":
+    if st.session_state.analysis_mode == "Target Account Research":
         st.markdown("### 2. My Solution")
         value_proposition = st.text_area(
             "Value Proposition / Product Focus", 
@@ -239,12 +282,12 @@ with col_content:
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Action Button
-    btn_label = "Generate Strategic Brief" if st.session_state.analysis_mode == "Sales Outreach" else "Generate Interview Strategy"
+    btn_label = "Generate Strategic Brief" if st.session_state.analysis_mode == "Target Account Research" else "Generate Interview Strategy"
     
     if st.button(btn_label, use_container_width=True):
         if not url:
             st.warning("Please enter a company URL.")
-        elif st.session_state.analysis_mode == "Interview Prep" and not jd_content:
+        elif st.session_state.analysis_mode == "Job Interview Prep" and not jd_content:
             st.warning("Please provide a Job Description.")
         elif not os.getenv("OPENAI_API_KEY"):
              st.error("API Key missing.")
@@ -278,4 +321,5 @@ with col_content:
 
     # Footer
     st.markdown("<br><br><br>", unsafe_allow_html=True)
+    st.markdown('<div style="text-align: center; color: #6B7280; font-size: 0.85rem; margin-top: 1rem;">v2.2 Intelligence Platform</div>', unsafe_allow_html=True)
     st.markdown('<div style="text-align: center; color: #6B7280; font-size: 0.85rem;"><a href="https://www.linkedin.com/in/stevedporter/" style="color: #6B7280; text-decoration: none;">Built by Somar Intelligence</a></div>', unsafe_allow_html=True)

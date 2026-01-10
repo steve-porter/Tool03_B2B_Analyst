@@ -38,7 +38,7 @@ def generate_brief(
     scraped_status_str = "Yes" if scraped_bool else "No (Restricted)"
     
     # Select prompt based on mode
-    if mode == "Interview Prep":
+    if "Interview" in mode:  # Handles both "Job Interview Prep" and legacy "Interview Prep"
         prompt = INTERVIEW_PREP_PROMPT.format(
             company_name=company_name,
             website_content=website_content[:10000], # Slightly smaller context for multi-source
