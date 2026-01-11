@@ -110,20 +110,38 @@ st.markdown("""
         font-weight: 600 !important;
     }
 
-    /* Hide radio circles completely */
-    div[data-testid="stRadio"] input[type="radio"] {
+    /* Hide radio circles completely - ULTRA AGGRESSIVE */
+    div[data-testid="stRadio"] input[type="radio"],
+    div[data-testid="stRadio"] input[type="radio"] + div,
+    div[data-testid="stRadio"] span[data-testid="stWidgetLabel"] > div:first-child {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        position: absolute !important;
+        width: 0 !important;
+        height: 0 !important;
+        pointer-events: none !important;
+        clip-path: inset(100%) !important;
     }
 
-    /* Mobile: stack vertically */
+    /* Mobile: stack vertically with full-width tiles */
     @media (max-width: 768px) {
         div[data-testid="stRadio"] > div[role="radiogroup"] {
             flex-direction: column !important;
+            gap: 12px !important;
         }
         
         div[data-testid="stRadio"] > div[role="radiogroup"] > label {
             max-width: 100% !important;
+            width: 100% !important;
             min-height: 4rem !important;
+            padding: 1rem !important;
+        }
+        
+        /* Mobile: left-align the label */
+        .mode-selector-label {
+            text-align: left !important;
+            padding-left: 0 !important;
         }
     }
 
@@ -187,6 +205,72 @@ st.markdown("""
         transform: translateY(-2px);
         box-shadow: 0 8px 25px rgba(34, 211, 238, 0.5) !important;
     }
+    
+    /* ===== MODE SELECTOR BUTTON STATES ===== */
+    
+    /* Primary button (SELECTED) - bordered card with cyan glow */
+    button[data-testid="stBaseButton-primary"] {
+        background-color: #232335 !important;
+        color: #FFFFFF !important;
+        border: 2px solid #22D3EE !important;
+        border-radius: 18px !important;
+        min-height: 4rem !important;
+        padding: 1rem !important;
+        font-weight: 600 !important;
+        font-size: 0.95rem !important;
+        box-shadow: 0 0 20px rgba(34, 211, 238, 0.3) !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Override text color for primary button */
+    button[data-testid="stBaseButton-primary"] *,
+    button[data-testid="stBaseButton-primary"] p,
+    button[data-testid="stBaseButton-primary"] span,
+    button[data-testid="stBaseButton-primary"] div {
+        color: #FFFFFF !important;
+    }
+    
+    /* Secondary button (UNSELECTED) - subtle border, muted */
+    button[data-testid="stBaseButton-secondary"] {
+        background-color: #232335 !important;
+        color: #9CA3AF !important;
+        border: 1.5px solid #2F3045 !important;
+        border-radius: 18px !important;
+        min-height: 4rem !important;
+        padding: 1rem !important;
+        font-weight: 500 !important;
+        font-size: 0.95rem !important;
+        transition: all 0.3s ease !important;
+    }
+    
+    /* Override text color for secondary button */
+    button[data-testid="stBaseButton-secondary"] *,
+    button[data-testid="stBaseButton-secondary"] p,
+    button[data-testid="stBaseButton-secondary"] span,
+    button[data-testid="stBaseButton-secondary"] div {
+        color: #9CA3AF !important;
+    }
+    
+    /* Hover states for mode selector */
+    button[data-testid="stBaseButton-secondary"]:hover {
+        border-color: #22D3EE !important;
+        color: #C7C9D3 !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    button[data-testid="stBaseButton-primary"]:hover {
+        box-shadow: 0 0 25px rgba(34, 211, 238, 0.4) !important;
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+        button[data-testid="stBaseButton-primary"],
+        button[data-testid="stBaseButton-secondary"] {
+            min-height: 3.5rem !important;
+            font-size: 0.9rem !important;
+        }
+    }
 
     /* Brief Container */
     .brief-container {
@@ -217,27 +301,36 @@ with col_content:
     if 'analysis_mode' not in st.session_state:
         st.session_state.analysis_mode = "Target Account Research"
     
-    # Mode selector - centered, prominent
-    col1, col2, col3 = st.columns([1, 2, 1])
+    # Mode selector label
+    st.markdown(
+        '<p class="mode-selector-label" style="text-align: center; color: #C7C9D3; font-size: 0.9rem; '
+        'margin-bottom: 0.75rem; font-weight: 500;">Select your intelligence focus:</p>',
+        unsafe_allow_html=True
+    )
+    
+    # Button-based mode selector (no radio buttons!)
+    col1, col2 = st.columns(2, gap="medium")
+    
+    with col1:
+        is_selected_research = st.session_state.analysis_mode == "Target Account Research"
+        if st.button(
+            "Target Account Research",
+            key="btn_research",
+            use_container_width=True,
+            type="primary" if is_selected_research else "secondary"
+        ):
+            st.session_state.analysis_mode = "Target Account Research"
+            st.rerun()
+    
     with col2:
-        st.markdown(
-            '<p style="text-align: center; color: #C7C9D3; font-size: 0.9rem; '
-            'margin-bottom: 0.75rem; font-weight: 500;">Select your intelligence focus:</p>',
-            unsafe_allow_html=True
-        )
-        
-        mode_choice = st.radio(
-            "Mode",
-            options=["Target Account Research", "Job Interview Prep"],
-            horizontal=True,
-            label_visibility="collapsed",
-            index=0 if st.session_state.analysis_mode == "Target Account Research" else 1,
-            key="mode_selector"
-        )
-        
-        # Update session state and rerun if changed
-        if mode_choice != st.session_state.analysis_mode:
-            st.session_state.analysis_mode = mode_choice
+        is_selected_interview = st.session_state.analysis_mode == "Job Interview Prep"
+        if st.button(
+            "Job Interview Prep",
+            key="btn_interview",
+            use_container_width=True,
+            type="primary" if is_selected_interview else "secondary"
+        ):
+            st.session_state.analysis_mode = "Job Interview Prep"
             st.rerun()
     
     st.markdown("<br>", unsafe_allow_html=True)
