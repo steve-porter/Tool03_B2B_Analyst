@@ -24,126 +24,16 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    html, body, [class*="css"] {
-        font-family: 'Inter', sans-serif;
+    /* Global font enforcement - Universal + Specific Overrides */
+    * , html, body, [class*="css"], [data-testid="stAppViewContainer"], .stMarkdown, p, div, span, button, h1, h2, h3, h4, h5, h6, label, input, textarea {
+        font-family: 'Inter', sans-serif !important;
     }
     
     .stApp {
         background-color: #1C1C2B;
     }
 
-    /* ===== INLINE MODE TOGGLE (SEGMENTED CONTROL) ===== */
-    
-    /* Container */
-    div[data-testid="stRadio"][data-baseweb="radio"] {
-        background-color: transparent !important;
-    }
 
-    /* Radio group - horizontal card-style layout */
-    div[data-testid="stRadio"] > div[role="radiogroup"] {
-        flex-direction: row !important;
-        gap: 16px !important;  /* Space between cards */
-        justify-content: center !important;
-        background-color: transparent !important;  /* Remove container background */
-        border-radius: 0 !important;
-        padding: 0 !important;
-        border: none !important;
-    }
-
-    /* Individual radio labels - bordered card style */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label {
-        flex: 1 !important;
-        min-height: 5rem !important;
-        max-width: 280px !important;
-        padding: 1rem 1.5rem !important;
-        
-        /* Always show border for definition */
-        border: 1.5px solid #2F3045 !important;
-        background-color: #232335 !important;
-        
-        border-radius: 18px !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-        margin: 0 !important;
-        
-        /* Center text */
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-        
-        color: #C7C9D3 !important;
-        font-weight: 500 !important;
-        font-size: 0.95rem !important;
-        line-height: 1.4 !important;
-    }
-
-    /* Hover state - preview selection with cyan border */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
-        border-color: #22D3EE !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    }
-
-    /* Selected state - cyan border + glow, SAME background */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) {
-        /* KEY: Keep same background as unselected for balance */
-        background-color: #232335 !important;
-        
-        /* Differentiate with border + glow */
-        border: 2px solid #22D3EE !important;
-        box-shadow: 0 0 20px rgba(34, 211, 238, 0.3) !important;
-        
-        /* Brighter text for selected state */
-        color: #FFFFFF !important;
-        font-weight: 600 !important;
-        
-        transform: none !important;
-    }
-
-    /* Force white text on selected state - override Streamlit */
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) *,
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) span,
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) p,
-    div[data-testid="stRadio"] > div[role="radiogroup"] > label:has(input:checked) div {
-        color: #FFFFFF !important;
-        font-weight: 600 !important;
-    }
-
-    /* Hide radio circles completely - ULTRA AGGRESSIVE */
-    div[data-testid="stRadio"] input[type="radio"],
-    div[data-testid="stRadio"] input[type="radio"] + div,
-    div[data-testid="stRadio"] span[data-testid="stWidgetLabel"] > div:first-child {
-        display: none !important;
-        opacity: 0 !important;
-        visibility: hidden !important;
-        position: absolute !important;
-        width: 0 !important;
-        height: 0 !important;
-        pointer-events: none !important;
-        clip-path: inset(100%) !important;
-    }
-
-    /* Mobile: stack vertically with full-width tiles */
-    @media (max-width: 768px) {
-        div[data-testid="stRadio"] > div[role="radiogroup"] {
-            flex-direction: column !important;
-            gap: 12px !important;
-        }
-        
-        div[data-testid="stRadio"] > div[role="radiogroup"] > label {
-            max-width: 100% !important;
-            width: 100% !important;
-            min-height: 4rem !important;
-            padding: 1rem !important;
-        }
-        
-        /* Mobile: left-align the label */
-        .mode-selector-label {
-            text-align: left !important;
-            padding-left: 0 !important;
-        }
-    }
 
     /* Text Contrast */
     h1, h2, h3, h4, h5, h6, label {
@@ -181,8 +71,10 @@ st.markdown("""
         opacity: 1 !important;
     }
 
-    /* Primary CTA Button */
-    .stButton button {
+    /* ===== CTA BUTTON STYLING (Targeted via marker) ===== */
+    
+    /* Find the button container that follows our marker */
+    div.element-container:has(#cta-marker) + div.element-container button {
         background: #22D3EE !important;
         color: #1C1C2B !important;
         border-radius: 18px !important;
@@ -190,20 +82,41 @@ st.markdown("""
         font-weight: 600 !important;
         border: none !important;
         transition: all 0.3s ease !important;
+        font-size: 1rem !important;
+        width: 100% !important;
     }
     
-    /* Force dark text on button - override Streamlit */
-    .stButton button *,
-    .stButton button p,
-    .stButton button span,
-    .stButton button div {
+    /* Force dark text on CTA button elements */
+    div.element-container:has(#cta-marker) + div.element-container button *,
+    div.element-container:has(#cta-marker) + div.element-container button p,
+    div.element-container:has(#cta-marker) + div.element-container button span,
+    div.element-container:has(#cta-marker) + div.element-container button div {
         color: #1C1C2B !important;
     }
     
-    .stButton button:hover {
+    /* Hover State */
+    div.element-container:has(#cta-marker) + div.element-container button:hover {
         background: #06B6D4 !important;
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(34, 211, 238, 0.5) !important;
+        color: #1C1C2B !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 8px 25px rgba(34, 211, 238, 0.4) !important;
+    }
+    
+    /* Focus State */
+    div.element-container:has(#cta-marker) + div.element-container button:focus {
+        background: #06B6D4 !important;
+        color: #1C1C2B !important;
+        outline: 2px solid #22D3EE !important;
+        outline-offset: 2px !important;
+        box-shadow: 0 8px 25px rgba(34, 211, 238, 0.4) !important;
+    }
+    
+    /* Active State */
+    div.element-container:has(#cta-marker) + div.element-container button:active {
+        background: #0891B2 !important;
+        color: #1C1C2B !important;
+        transform: translateY(0) !important;
+        box-shadow: 0 4px 12px rgba(34, 211, 238, 0.3) !important;
     }
     
     /* ===== MODE SELECTOR BUTTON STATES ===== */
@@ -272,14 +185,33 @@ st.markdown("""
         }
     }
 
-    /* Brief Container */
-    .brief-container {
-        background-color: #232335;
-        padding: 2.5rem;
-        border-radius: 18px;
-        border: 1px solid #2F3045;
-        margin-top: 2rem;
-        color: #E5E7EB;
+    /* Brief Container */\r
+    .brief-container {\r
+        background-color: #232335;\r
+        padding: 2.5rem;\r
+        border-radius: 18px;\r
+        border: 1px solid #2F3045;\r
+        margin-top: 2rem;\r
+        color: #E5E7EB;\r
+    }\r
+    \r
+    /* Mobile Responsive - Title and Subtitle */\r
+    @media (max-width: 768px) {\r
+        h1.main-header {\r
+            font-size: 2rem !important;\r
+            margin-bottom: 0.75rem !important;\r
+        }\r
+        \r
+        h1.main-header + p {\r
+            font-size: 1rem !important;\r
+            margin-bottom: 2rem !important;\r
+        }\r
+        \r
+        button[data-testid="stBaseButton-primary"],\r
+        button[data-testid="stBaseButton-secondary"] {\r
+            min-height: 3.5rem !important;\r
+            font-size: 0.9rem !important;\r
+        }\r
     }
 
     footer {display: none !important;}
@@ -295,6 +227,16 @@ col_spacer, col_content = st.columns([1, 10])
 
 with col_content:
     st.markdown('<h1 class="main-header">Company Intelligence Platform</h1>', unsafe_allow_html=True)
+    
+    # Subtitle
+    st.markdown(
+        '<p style="text-align: left; color: #C7C9D3; font-size: 1.15rem; '
+        'font-weight: 400; margin-bottom: 2.2rem; letter-spacing: 0.01em; '
+        'margin-left: 0.25rem; margin-top: -1.2rem;">'
+        'AI-powered deep company research</p>', 
+        unsafe_allow_html=True
+    )
+    
     st.markdown("<br>", unsafe_allow_html=True)
     
     # Initialize session state for mode
@@ -303,8 +245,8 @@ with col_content:
     
     # Mode selector label
     st.markdown(
-        '<p class="mode-selector-label" style="text-align: center; color: #C7C9D3; font-size: 0.9rem; '
-        'margin-bottom: 0.75rem; font-weight: 500;">Select your intelligence focus:</p>',
+        '<p class="mode-selector-label" style="text-align: center; color: #FFFFFF; font-size: 1rem; '
+        'margin-bottom: 1rem; font-weight: 500; letter-spacing: 0.02em;">Select your intelligence focus:</p>',
         unsafe_allow_html=True
     )
     
@@ -374,10 +316,11 @@ with col_content:
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    # Action Button
+    # Action Button - target specifically with marker for stable styling
     btn_label = "Generate Strategic Brief" if st.session_state.analysis_mode == "Target Account Research" else "Generate Interview Strategy"
     
-    if st.button(btn_label, use_container_width=True):
+    st.markdown('<span id="cta-marker"></span>', unsafe_allow_html=True)
+    if st.button(btn_label, key="cta_main", use_container_width=True):
         if not url:
             st.warning("Please enter a company URL.")
         elif st.session_state.analysis_mode == "Job Interview Prep" and not jd_content:
